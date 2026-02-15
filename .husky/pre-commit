@@ -1,0 +1,4 @@
+# Pre-commit: lint & format staged files, type-check, enforce architecture boundaries
+npx lint-staged
+npm run typecheck
+npm run lint:deps

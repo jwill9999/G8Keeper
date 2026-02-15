@@ -1,0 +1,4 @@
+# Pre-push: full build, tests, and all validations
+npm run build
+npm test
+npm run lint:deps

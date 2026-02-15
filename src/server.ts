@@ -1,0 +1,147 @@
+import express, { Request, Response, NextFunction, Application } from 'express';
+import session from 'express-session';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+
+// Config
+import { config } from './config/env.js';
+
+// Infrastructure
+import { connectDB } from './infrastructure/auth/database/mongo.js';
+import { MongoUserRepository } from './infrastructure/auth/repositories/MongoUserRepository.js';
+import { JwtTokenProvider } from './infrastructure/auth/providers/JwtTokenProvider.js';
+import { BcryptPasswordHasher } from './infrastructure/auth/providers/BcryptPasswordHasher.js';
+import { configurePassport } from './infrastructure/auth/providers/passport.js';
+import passport from 'passport';
+
+// Application
+import { RegisterUser } from './application/auth/use-cases/RegisterUser.js';
+import { LoginUser } from './application/auth/use-cases/LoginUser.js';
+
+// Interface
+import { AuthController } from './interfaces/http/controllers/AuthController.js';
+import { ProtectedController } from './interfaces/http/controllers/ProtectedController.js';
+import { createAuthMiddleware } from './interfaces/http/middleware/AuthMiddleware.js';
+import { createRoutes } from './interfaces/http/routes.js';
+import { swaggerSpec } from './interfaces/http/swagger.js';
+import logger from './interfaces/http/middleware/logger.js';
+
+// --- Composition Root ---
+
+const app: Application = express();
+
+// Connect to database
+connectDB(config.mongoUri);
+
+// Infrastructure instances
+const userRepo = new MongoUserRepository();
+const tokenProvider = new JwtTokenProvider(config.jwtSecret, config.jwtExpiresIn);
+const passwordHasher = new BcryptPasswordHasher();
+
+// Passport (Google OAuth)
+configurePassport(config.google, userRepo);
+
+// Use cases
+const registerUser = new RegisterUser(userRepo, passwordHasher, tokenProvider);
+const loginUser = new LoginUser(userRepo, passwordHasher, tokenProvider);
+
+// Middleware
+const authMiddleware = createAuthMiddleware(tokenProvider);
+
+// Controllers
+const authController = new AuthController(registerUser, loginUser, tokenProvider);
+const protectedController = new ProtectedController(authMiddleware);
+
+// --- Express Setup ---
+
+logger.combined(app);
+
+app.use(
+  cors({
+    origin: config.frontendUrl,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+if (!config.sessionSecret) {
+  throw new Error('SESSION_SECRET is not defined in environment variables');
+}
+
+app.use(
+  session({
+    secret: config.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Swagger documentation
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Auth API Documentation',
+  }),
+);
+
+// Routes
+app.use(createRoutes(authController, protectedController));
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API health check
+ *     tags: [Health]
+ *     description: Returns API status and available endpoints
+ *     responses:
+ *       200:
+ *         description: API is running
+ */
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: 'Auth API is running',
+    documentation: `http://localhost:${config.port}/api-docs`,
+    endpoints: {
+      auth: {
+        register: 'POST /auth/register',
+        login: 'POST /auth/login',
+        googleLogin: 'GET /auth/google',
+        googleCallback: 'GET /auth/google/callback',
+      },
+      protected: {
+        data: 'GET /api/data (requires JWT)',
+        profile: 'GET /api/profile (requires JWT)',
+      },
+    },
+  });
+});
+
+// Error handling middleware
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Something went wrong!',
+    error: config.nodeEnv === 'development' ? err.message : undefined,
+  });
+});
+
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
+});
+
+app.listen(config.port, () => {
+  console.log(`Server running on port ${config.port}`);
+  console.log(`Visit http://localhost:${config.port} for API info`);
+});
