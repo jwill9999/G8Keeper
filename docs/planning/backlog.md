@@ -2,7 +2,7 @@
 
 Features, improvements, and tasks planned for future development.
 
-**Total Items:** 14 | **High:** 2 | **Medium:** 4 | **Low:** 4 | **Tech Debt:** 4
+**Total Items:** 15 | **High:** 3 | **Medium:** 4 | **Low:** 4 | **Tech Debt:** 4
 
 ---
 
@@ -12,6 +12,7 @@ Features, improvements, and tasks planned for future development.
 | --- | -------------------------------- | --------- | ------ | --------- | ---------- | ----------------------------------- |
 | 1   | Rate Limiting Middleware         | 🔴 High   | Small  | 2-4h      | 📋 Planned | [↓](#rate-limiting-middleware)      |
 | 2   | ~~Refresh Token Implementation~~ | ~~🔴 High~~ | ~~Medium~~ | ~~8-12h~~ | ✅ Done | [↓](#refresh-token-implementation)  |
+| 2a  | Frontend Auth Integration        | 🔴 High   | Medium | 6-10h     | 📋 Planned | [↓](#frontend-auth-integration)     |
 | 3   | Email Verification               | 🔴 High   | Large  | 16-20h    | 📋 Planned | [↓](#email-verification)            |
 | 4   | Automated Testing Suite          | 🟡 Medium | Large  | 20-30h    | 📋 Planned | [↓](#automated-testing-suite)       |
 | 5   | Password Reset Flow              | 🟡 Medium | Medium | 10-14h    | 📋 Planned | [↓](#password-reset-flow)           |
@@ -91,6 +92,110 @@ Implemented as "JWT Lifecycle Hardening" — rotating refresh tokens with reuse 
 - [x] Add logout endpoint to invalidate tokens (`/auth/logout`, `/auth/logout-all`, `/auth/admin/revoke`)
 - [x] Update documentation
 - [x] Add integration tests (45 new tests)
+
+---
+
+### Frontend Auth Integration
+
+**Priority:** 🔴 High  
+**Effort:** Medium  
+**Dependencies:** Refresh Token Implementation (✅ Done)
+
+**Description:**  
+The backend now issues short-lived access tokens (5m) with rotating refresh tokens in httpOnly cookies. The frontend must be updated to work with this new token lifecycle — without these changes, users would be forced to re-login every 5 minutes.
+
+**Background — what changed:**
+
+| Before | After |
+|--------|-------|
+| Login returns a 24h access token | Login returns a 5m access token + httpOnly refresh cookie |
+| Token stored in localStorage | Access token held in memory only; refresh token managed by browser cookie jar |
+| No refresh mechanism needed | Must call `POST /auth/refresh` before access token expires |
+| Logout = clear local token | Logout = call `POST /auth/logout` to revoke server-side session |
+
+**What stays the same:**
+- Login form → `POST /auth/login` (same request body)
+- Register form → `POST /auth/register` (same request body)
+- Google SSO → `GET /auth/google` redirect (same flow)
+- Protected calls → `Authorization: Bearer <token>` header (same)
+
+**Acceptance Criteria:**
+
+#### 1. Credentials Mode
+- [ ] All API calls to `/auth/*` include `credentials: 'include'` (fetch) or `withCredentials: true` (axios) so httpOnly cookies are sent
+
+#### 2. In-Memory Token Storage
+- [ ] Access token stored in a JS variable / reactive state (not localStorage or sessionStorage)
+- [ ] On page reload, call `POST /auth/refresh` to restore the session from the cookie
+- [ ] Clear in-memory token on logout
+
+#### 3. Auth Interceptor (Auto-Refresh)
+- [ ] Create an HTTP interceptor (axios interceptor or fetch wrapper) that:
+  - Detects 401 responses on protected API calls
+  - Calls `POST /auth/refresh` to obtain a new access token
+  - Retries the original failed request with the new token
+  - If refresh also fails (401), redirect to login
+- [ ] Proactive refresh: optionally refresh the token before the 5m window expires (e.g., at 4m mark) to avoid latency on the first 401
+
+#### 4. Refresh Queue (Race Condition Handling)
+- [ ] If multiple API calls receive 401 simultaneously, only one triggers the refresh
+- [ ] Other calls wait for the refresh to complete, then retry with the new token
+- [ ] Prevent infinite refresh loops (e.g., max 1 retry per request)
+
+#### 5. Logout Integration
+- [ ] "Logout" button calls `POST /auth/logout` (with `credentials: 'include'` to send cookie)
+- [ ] Clear in-memory access token and redirect to login
+- [ ] Optionally add "Logout all devices" button that calls `POST /auth/logout-all` with `Authorization: Bearer <token>`
+
+#### 6. Login / Register Response Handling
+- [ ] On successful login/register, extract `token` from response body and store in memory
+- [ ] Do NOT try to read the refresh token — it's set as an httpOnly cookie automatically
+- [ ] Redirect to the authenticated area of the app
+
+#### 7. Google SSO Callback
+- [ ] After Google OAuth redirect, extract access token from response
+- [ ] Refresh cookie is set automatically by the API — no additional handling needed
+
+#### 8. Error Handling
+- [ ] Handle `TokenReuseDetectedError` (401 with "reuse detected" message) — clear state and force full re-login
+- [ ] Handle `SessionExpiredError` — redirect to login with appropriate message
+- [ ] Handle network errors during refresh gracefully
+
+**Implementation Notes:**
+
+```typescript
+// Example: Axios interceptor pattern
+let accessToken: string | null = null;
+let refreshPromise: Promise<string> | null = null;
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 && !error.config._retry) {
+      error.config._retry = true;
+      
+      // Deduplicate concurrent refresh calls
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      
+      accessToken = await refreshPromise;
+      error.config.headers.Authorization = `Bearer ${accessToken}`;
+      return api(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+**Acceptance Testing:**
+- [ ] Login → receive token → access protected route → wait 5m → auto-refresh works
+- [ ] Open two tabs → both share the same cookie → refresh works in both
+- [ ] Logout → cookie cleared → refresh fails → redirected to login
+- [ ] Logout all devices → other tabs fail on next refresh → redirected to login
+- [ ] Simulate token theft (replay old refresh token) → reuse detected → forced re-login
 
 ---
 
@@ -492,5 +597,5 @@ Add GraphQL API alongside REST API for more flexible data fetching.
 ---
 
 **Last Updated:** 2026-02-21  
-**Total Items:** 14 prioritized + 4 technical debt + ideas  
+**Total Items:** 15 prioritized + 4 technical debt + ideas  
 **Next Review:** 2026-03-01
