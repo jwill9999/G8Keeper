@@ -18,6 +18,7 @@ This document tracks all features, changes, and additions to the project with ti
 | 6   | Mongoose 9 Compatibility Fix    | 2026-02-15 | 🔴 High   | ✅ Complete | Registration working    | [↓](#mongoose-9-compatibility-fix---2026-02-15)    |
 | 7   | Initial Project Setup           | 2026-02-14 | 🔴 High   | ✅ Complete | Core auth system        | [↓](#initial-project-setup---2026-02-14)           |
 | 8   | Feature Planning Skill          | 2026-02-21 | 🟡 Medium | ✅ Complete | Structured planning     | [↓](#feature-planning-skill---2026-02-21)          |
+| 9   | JWT Lifecycle Hardening         | 2026-02-21 | 🔴 High   | ✅ Complete | Secure token lifecycle  | [↓](#jwt-lifecycle-hardening---2026-02-21)         |
 
 > **Note:** When completed features exceed 15 items, individual features will be moved to separate files in `completed/` directory.
 
@@ -341,9 +342,70 @@ Added a new Copilot skill (`feature-planning`) that provides a structured workfl
 
 ---
 
+### JWT Lifecycle Hardening - 2026-02-21
+**Status:** ✅ Completed  
+**Author:** Development Team  
+**Priority:** 🔴 High  
+
+**Description:**  
+Added full refresh token lifecycle with rotating tokens, reuse detection, and revocation controls. Access tokens are now short-lived (5m) with 7-day refresh tokens stored in secure httpOnly cookies. Supports current-session logout, all-device logout, and admin-forced revocation.
+
+**Changes:**
+- Added `RefreshSession` domain entity with token family tracking
+- Added domain errors: `SessionNotFoundError`, `SessionExpiredError`, `SessionRevokedError`, `TokenReuseDetectedError`
+- Added `RefreshSessionRepository` and `RefreshTokenProvider` application ports
+- Added use cases: `RefreshSessionUseCase`, `LogoutCurrentSession`, `LogoutAllSessions`, `AdminRevokeSessions`
+- Updated `LoginUser` and `RegisterUser` to issue refresh tokens
+- Added `MongoRefreshSessionRepository` with TTL index for auto-cleanup
+- Added `JwtRefreshTokenProvider` with SHA-256 token hashing and unique JTI
+- Extended `AuthController` with `/auth/refresh`, `/auth/logout`, `/auth/logout-all`, `/auth/admin/revoke`
+- Updated `AuthMiddleware` for strict `Bearer` prefix parsing
+- Google OAuth callback now shares the same session lifecycle
+- Added `cookie-parser` middleware for httpOnly cookie transport
+
+**Files Added:**
+- `src/domain/auth/RefreshSession.ts`
+- `src/application/auth/ports/RefreshSessionRepository.ts`
+- `src/application/auth/ports/RefreshTokenProvider.ts`
+- `src/application/auth/dtos/RefreshSessionDTO.ts`
+- `src/application/auth/dtos/LogoutDTO.ts`
+- `src/application/auth/dtos/AdminRevokeDTO.ts`
+- `src/application/auth/use-cases/RefreshSession.ts`
+- `src/application/auth/use-cases/LogoutCurrentSession.ts`
+- `src/application/auth/use-cases/LogoutAllSessions.ts`
+- `src/application/auth/use-cases/AdminRevokeSessions.ts`
+- `src/infrastructure/auth/repositories/MongoRefreshSessionRepository.ts`
+- `src/infrastructure/auth/providers/JwtRefreshTokenProvider.ts`
+
+**Files Modified:**
+- `src/domain/auth/errors.ts` — session lifecycle errors
+- `src/domain/auth/AuthToken.ts` — optional `refreshToken`
+- `src/application/auth/use-cases/LoginUser.ts` — refresh session creation
+- `src/application/auth/use-cases/RegisterUser.ts` — refresh session creation
+- `src/interfaces/http/controllers/AuthController.ts` — new endpoints + cookie handling
+- `src/interfaces/http/middleware/AuthMiddleware.ts` — strict Bearer parsing
+- `src/interfaces/http/app.ts` — new dependencies + cookie-parser
+- `src/config/env.ts` — refresh token config
+- `src/server.ts` — composition root wiring
+
+**Impact:**
+- ✅ Rotating refresh tokens with reuse detection
+- ✅ Token family-based revocation on reuse
+- ✅ Per-session, all-device, and admin-forced logout
+- ✅ Short-lived access tokens (5m default)
+- ✅ Secure httpOnly cookie transport for refresh tokens
+- ✅ Google OAuth shares same lifecycle as email/password login
+- ✅ 45 new tests (86 total, all passing)
+- ✅ Zero architecture boundary violations
+
+**Related Docs:**
+- [Backlog: Refresh Token Implementation](backlog.md#refresh-token-implementation) (completed)
+
+---
+
 ## Summary Statistics
 
-**Total Features Completed:** 7  
+**Total Features Completed:** 9  
 **Total Files Created:** 40+  
 **Total Lines of Code:** ~3,500+  
 **Test Coverage:** Manual testing (automated tests pending)  
@@ -359,5 +421,5 @@ Added a new Copilot skill (`feature-planning`) that provides a structured workfl
 ---
 
 **Last Updated:** 2026-02-21  
-**Current Version:** 1.0.0  
+**Current Version:** 1.1.0  
 **Next Milestone:** See [Backlog](./backlog.md)
