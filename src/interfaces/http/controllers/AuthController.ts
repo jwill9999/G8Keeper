@@ -134,13 +134,44 @@ export class AuthController {
      * @swagger
      * /auth/refresh:
      *   post:
-     *     summary: Refresh access token using refresh token cookie
+     *     summary: Refresh access token
+     *     description: >
+     *       Issues a new access token and rotates the refresh token. The refresh token is
+     *       read from the `refreshToken` cookie (preferred) or the request body. A new
+     *       `refreshToken` HttpOnly cookie is set in the response.
      *     tags: [Authentication]
+     *     parameters:
+     *       - in: cookie
+     *         name: refreshToken
+     *         schema:
+     *           type: string
+     *         description: Refresh token cookie (takes precedence over request body).
+     *     requestBody:
+     *       required: false
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               refreshToken:
+     *                 type: string
+     *                 description: Refresh token (used when cookie is not present).
      *     responses:
      *       200:
-     *         description: Tokens refreshed successfully
+     *         description: Tokens refreshed successfully. A new `refreshToken` cookie is set.
+     *         headers:
+     *           Set-Cookie:
+     *             description: New HttpOnly refresh token cookie.
+     *             schema:
+     *               type: string
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/AuthResponse'
      *       401:
-     *         description: Invalid or expired refresh token
+     *         description: Invalid, expired, or revoked refresh token.
+     *       500:
+     *         description: Server error.
      */
     this.router.post('/refresh', this.refresh.bind(this));
 
