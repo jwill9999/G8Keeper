@@ -54,7 +54,7 @@ export class AuthController {
     return (
       this.cookieOptions ?? {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/auth',
         maxAge: 7 * 24 * 60 * 60 * 1000,
