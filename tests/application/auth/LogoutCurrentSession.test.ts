@@ -24,6 +24,7 @@ describe('LogoutCurrentSession Use Case', () => {
     sessionRepo = {
       save: vi.fn(),
       findByTokenHash: vi.fn().mockResolvedValue(existingSession),
+      findByTokenHashAndRevoke: vi.fn(),
       revokeById: vi.fn().mockResolvedValue(undefined),
       revokeByFamily: vi.fn(),
       revokeAllByUserId: vi.fn(),

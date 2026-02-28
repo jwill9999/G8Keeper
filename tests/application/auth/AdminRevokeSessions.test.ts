@@ -11,6 +11,7 @@ describe('AdminRevokeSessions Use Case', () => {
     sessionRepo = {
       save: vi.fn(),
       findByTokenHash: vi.fn(),
+      findByTokenHashAndRevoke: vi.fn(),
       revokeById: vi.fn(),
       revokeByFamily: vi.fn(),
       revokeAllByUserId: vi.fn().mockResolvedValue(undefined),
