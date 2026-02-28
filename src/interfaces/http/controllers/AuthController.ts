@@ -149,10 +149,31 @@ export class AuthController {
      * /auth/logout:
      *   post:
      *     summary: Logout current session
+     *     description: >
+     *       Logs out the current session. Accepts an optional refresh token provided either
+     *       in the request body or as a cookie. If no token is provided, the endpoint
+     *       still responds with success to allow idempotent logout behavior.
      *     tags: [Authentication]
+     *     parameters:
+     *       - in: cookie
+     *         name: refreshToken
+     *         required: false
+     *         schema:
+     *           type: string
+     *         description: Optional refresh token cookie for the current session.
+     *     requestBody:
+     *       required: false
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               refreshToken:
+     *                 type: string
+     *                 description: Optional refresh token to revoke from the request body.
      *     responses:
      *       200:
-     *         description: Logged out successfully
+     *         description: Logged out successfully (even if no refresh token was provided)
      */
     this.router.post('/logout', this.logout.bind(this));
 
