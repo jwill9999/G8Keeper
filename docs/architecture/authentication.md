@@ -81,7 +81,7 @@ No database lookup is needed — access tokens are stateless JWTs.
 
 ### 3. Token Refresh (Rotation)
 
-When the access token expires, the client calls `/auth/refresh`. The old refresh token is revoked and a new pair is issued **within the same token family**:
+When the access token expires, the client calls `/auth/refresh`. The old refresh token is revoked **atomically** and a new pair is issued **within the same token family**:
 
 ```
 Client                    API                       MongoDB
@@ -97,7 +97,10 @@ Client                    API                       MongoDB
   │                        │  check: not revoked?      │
   │                        │  check: not expired?      │
   │                        │                          │
-  │                        │──revokeById (old)────────▶│
+  │                        │──revokeById (atomic) ────▶│
+  │                        │  findOneAndUpdate         │
+  │                        │  { _id, revoked: false }  │
+  │                        │◀── true (won race) ───────│
   │                        │                          │
   │                        │  generate new access token │
   │                        │  generate new refresh token│
@@ -109,6 +112,8 @@ Client                    API                       MongoDB
   │  Body: { token }       │                          │
   │  Cookie: new refresh   │                          │
 ```
+
+**Concurrent request handling**: `revokeById` uses `findOneAndUpdate({ _id, revoked: false })` so only one concurrent caller can win the atomic revocation. If `revokeById` returns `false` (session already revoked by a concurrent rotation), the request throws `SessionNotFoundError` **without revoking the family** — this is a benign race, not a replay attack.
 
 ### 4. Reuse Detection
 
@@ -168,6 +173,7 @@ Login → family: "abc-123"
 
 | Threat | Mitigation |
 |--------|-----------|
+| Concurrent refresh requests (two tabs racing) | Atomic `revokeById` (`findOneAndUpdate({ revoked: false })`) — only one caller wins; the other gets `SessionNotFoundError` without family revocation |
 | XSS stealing refresh token | httpOnly cookie — not accessible to JavaScript |
 | Replay attack (stolen refresh token) | Rotation + reuse detection → family revocation |
 | Long-lived token exposure | Access tokens expire in 5 minutes |
@@ -224,5 +230,5 @@ Login → family: "abc-123"
 
 ---
 
-**Last Updated:** 2026-02-21
+**Last Updated:** 2026-02-28
 **Author:** Development Team

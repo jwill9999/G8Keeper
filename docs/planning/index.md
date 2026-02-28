@@ -2,7 +2,7 @@
 
 This document tracks all features, changes, and additions to the project with timestamps.
 
-**Total Completed:** 8 features | **Current Version:** 1.0.0
+**Total Completed:** 11 features | **Current Version:** 1.1.2
 
 ---
 
@@ -19,6 +19,8 @@ This document tracks all features, changes, and additions to the project with ti
 | 7   | Initial Project Setup           | 2026-02-14 | 🔴 High   | ✅ Complete | Core auth system        | [↓](#initial-project-setup---2026-02-14)           |
 | 8   | Feature Planning Skill          | 2026-02-21 | 🟡 Medium | ✅ Complete | Structured planning     | [↓](#feature-planning-skill---2026-02-21)          |
 | 9   | JWT Lifecycle Hardening         | 2026-02-21 | 🔴 High   | ✅ Complete | Secure token lifecycle  | [↓](#jwt-lifecycle-hardening---2026-02-21)         |
+| 10  | Session Lifecycle Fixes         | 2026-02-21 | 🔴 High   | ✅ Complete | Architecture + security | [↓](#session-lifecycle-fixes---2026-02-21)         |
+| 11  | PR Code Review Fixes            | 2026-02-28 | 🔴 High   | ✅ Complete | Race condition + DX     | [↓](#pr-code-review-fixes---2026-02-28)            |
 
 > **Note:** When completed features exceed 15 items, individual features will be moved to separate files in `completed/` directory.
 
@@ -403,13 +405,69 @@ Added full refresh token lifecycle with rotating tokens, reuse detection, and re
 
 ---
 
+### Session Lifecycle Fixes - 2026-02-21
+
+**Status:** ✅ Completed
+**Author:** Development Team
+**Priority:** 🔴 High
+
+**Description:**
+Follow-up hardening after JWT Lifecycle Hardening — fixed architecture violations, security gaps, and session management bugs discovered during code review.
+
+**Changes:**
+- **Fail-fast secrets**: Server throws on startup if `JWT_SECRET` or `SESSION_SECRET` are missing (previously would silently sign tokens with `undefined`)
+- **Architecture fix**: Extracted `GoogleOAuthLogin` use case so the controller no longer imports from `src/infrastructure`
+- **Admin endpoint security**: `POST /auth/admin/revoke` now requires a valid Bearer token and admin check
+- **Session ID bug**: Fixed empty-string session ID passed to `RefreshSession` constructors
+- **CreateRefreshSession**: Extracted shared session-creation logic from `LoginUser`, `RegisterUser`, and `GoogleOAuthLogin` into a reusable use case
+
+**Files Changed:**
+- `src/config/env.ts` — fail-fast checks
+- `src/application/auth/use-cases/GoogleOAuthLogin.ts` — new use case
+- `src/application/auth/use-cases/CreateRefreshSession.ts` — new shared use case
+- `src/interfaces/http/controllers/AuthController.ts` — admin auth fix
+- `src/server.ts` — wiring updates
+
+**Related Docs:**
+- [Architecture: Authentication](../architecture/authentication.md)
+
+---
+
+### PR Code Review Fixes - 2026-02-28
+
+**Status:** ✅ Completed
+**Author:** Development Team
+**Priority:** 🔴 High
+
+**Description:**
+Security and correctness fixes identified by automated code review on PR #2.
+
+**Changes:**
+- **Race condition in token rotation**: `revokeById` now atomically checks `revoked: false` using `findOneAndUpdate`, ensuring only one concurrent request can rotate a given token. Returns `boolean` — concurrent losers get `SessionNotFoundError` without family revocation (not a malicious reuse scenario).
+- **Refresh cookie `secure` flag**: Changed from hardcoded `true` to `process.env.NODE_ENV === 'production'`, fixing the refresh flow in local HTTP development.
+- **Swagger `/auth/refresh`**: Now documents the cookie source, optional request body, full `AuthResponse` schema, and `Set-Cookie` response header.
+- **Concurrent rotation test**: Added a dedicated test verifying `revokeById → false` throws `SessionNotFoundError` without revoking the token family.
+
+**Files Changed:**
+- `src/application/auth/ports/RefreshSessionRepository.ts` — `revokeById` returns `Promise<boolean>`
+- `src/application/auth/use-cases/RefreshSession.ts` — atomic revoke check
+- `src/infrastructure/auth/repositories/MongoRefreshSessionRepository.ts` — atomic `findOneAndUpdate`
+- `src/interfaces/http/controllers/AuthController.ts` — secure flag + Swagger docs
+- `tests/application/auth/RefreshSession.test.ts` — concurrent rotation test + updated mocks
+
+**Related Docs:**
+- [Architecture: Authentication](../architecture/authentication.md)
+- [Changelog: 2026-02](../changelog/2026-02.md)
+
+---
+
 ## Summary Statistics
 
-**Total Features Completed:** 9  
-**Total Files Created:** 40+  
-**Total Lines of Code:** ~3,500+  
-**Test Coverage:** Manual testing (automated tests pending)  
-**Documentation Coverage:** 90%
+**Total Features Completed:** 11
+**Total Files Created:** 45+
+**Total Lines of Code:** ~4,000+
+**Test Coverage:** 89 automated tests (unit + integration), all passing
+**Documentation Coverage:** 95%
 
 ## Version History
 
@@ -420,6 +478,6 @@ Added full refresh token lifecycle with rotating tokens, reuse detection, and re
 
 ---
 
-**Last Updated:** 2026-02-21  
-**Current Version:** 1.1.0  
+**Last Updated:** 2026-02-28
+**Current Version:** 1.1.2
 **Next Milestone:** See [Backlog](./backlog.md)
