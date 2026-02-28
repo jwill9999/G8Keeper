@@ -67,8 +67,8 @@ validate: ## Run all checks (typecheck + lint + boundaries + format)
 docker-build: ## Build (or rebuild) dev Docker image
 	docker compose build
 
-docker-rebuild: ## Rebuild dev image and restart containers
-	docker compose up -d --build
+docker-rebuild: ## Stop containers, rebuild dev image, and start fresh
+	docker compose down && docker compose up -d --build
 
 docker-up: ## Start dev containers (existing image)
 	docker compose up -d
@@ -84,8 +84,8 @@ docker-logs: ## Tail dev container logs
 docker-prod-build: ## Build (or rebuild) production Docker image
 	docker compose -f docker-compose.prod.yml build
 
-docker-prod-rebuild: ## Rebuild production image and restart containers
-	docker compose -f docker-compose.prod.yml up -d --build
+docker-prod-rebuild: ## Stop containers, rebuild production image, and start fresh
+	docker compose -f docker-compose.prod.yml down && docker compose -f docker-compose.prod.yml up -d --build
 
 docker-prod-up: ## Start production containers (existing image)
 	docker compose -f docker-compose.prod.yml up -d
