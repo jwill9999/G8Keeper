@@ -471,7 +471,10 @@ The current `express-rate-limit` middleware uses an **in-memory store**, which m
 - [ ] Verify counters are shared across two parallel app instances
 - [ ] Graceful degradation when Redis is down (log warning, don't crash)
 - [ ] Update tests (mock Redis store)
-- [ ] Update documentation
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/architecture/overview.md` to note Redis as rate limit store
 
 **Notes:**
 Must be implemented before deploying more than one Node instance in production. Safe to skip until horizontal scaling is needed.
@@ -502,7 +505,11 @@ Move coarse-grained rate limiting to the Nginx reverse proxy layer so that exces
 - [ ] Configure `limit_req_status 429` and a custom JSON error page
 - [ ] Relax app-level limits to act as backstop only (e.g. 2× Nginx limit)
 - [ ] Test that Nginx blocks before Node handles the request (check access logs)
-- [ ] Update `docs/guides/deployment.md` with Nginx rate limiting notes
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Create/update `docs/guides/deployment.md` — document Nginx rate limiting config and how to tune limits
+- [ ] Update `docs/architecture/overview.md` — note Nginx as the primary rate limiting layer
 - [ ] Update `docker-compose.prod.yml` with Nginx service config
 
 ---
