@@ -3,12 +3,14 @@ import type { UserRepository } from '../ports/UserRepository.js';
 import type { PasswordHasher } from '../ports/PasswordHasher.js';
 import type { TokenProvider } from '../ports/TokenProvider.js';
 import type { LoginDTO } from '../dtos/LoginDTO.js';
+import type { CreateRefreshSession } from './CreateRefreshSession.js';
 
 export class LoginUser {
   constructor(
     private userRepo: UserRepository,
     private passwordHasher: PasswordHasher,
     private tokenProvider: TokenProvider,
+    private createRefreshSession?: CreateRefreshSession,
   ) {}
 
   async execute(input: LoginDTO) {
@@ -33,8 +35,14 @@ export class LoginUser {
 
     const token = this.tokenProvider.generate(user.id, user.email);
 
+    let refreshToken: string | undefined;
+    if (this.createRefreshSession) {
+      refreshToken = await this.createRefreshSession.execute(user.id);
+    }
+
     return {
       token,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,

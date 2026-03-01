@@ -4,12 +4,14 @@ import type { UserRepository } from '../ports/UserRepository.js';
 import type { PasswordHasher } from '../ports/PasswordHasher.js';
 import type { TokenProvider } from '../ports/TokenProvider.js';
 import type { RegisterDTO } from '../dtos/RegisterDTO.js';
+import type { CreateRefreshSession } from './CreateRefreshSession.js';
 
 export class RegisterUser {
   constructor(
     private userRepo: UserRepository,
     private passwordHasher: PasswordHasher,
     private tokenProvider: TokenProvider,
+    private createRefreshSession?: CreateRefreshSession,
   ) {}
 
   async execute(input: RegisterDTO) {
@@ -20,6 +22,10 @@ export class RegisterUser {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(input.email)) {
       throw new ValidationError('Invalid email format');
+    }
+
+    if (input.password.length < 8) {
+      throw new ValidationError('Password must be at least 8 characters');
     }
 
     const hasUppercase = /[A-Z]/.test(input.password);
@@ -43,8 +49,14 @@ export class RegisterUser {
 
     const token = this.tokenProvider.generate(savedUser.id, savedUser.email);
 
+    let refreshToken: string | undefined;
+    if (this.createRefreshSession) {
+      refreshToken = await this.createRefreshSession.execute(savedUser.id);
+    }
+
     return {
       token,
+      refreshToken,
       user: {
         id: savedUser.id,
         email: savedUser.email,

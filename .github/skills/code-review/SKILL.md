@@ -18,11 +18,32 @@ Run these phases in order, looping until clean:
 
 Exit when: the Reviewer finds zero new issues AND `npm run validate && npm run test` exits 0.
 
+**Minimum loop policy:** Always run at least one full confirmatory pass after the last fix loop.
+Never terminate immediately after a loop that fixed issues — always re-enter Phase 1 to
+confirm the fixes introduced nothing new. Only terminate on a loop where the Reviewer
+finds zero new issues from the start.
+
+## Model & Tooling Assignments
+
+Each phase uses the best model for the job. Models are set explicitly via the `model`
+parameter on each `task` call — Copilot does not auto-select:
+
+| Phase | agent_type | model | Rationale |
+|-------|-----------|-------|-----------|
+| REVIEW | `code-review` | `claude-opus-4.6` | Deep reasoning across many files; subtle bug and security detection |
+| FIX | `general-purpose` | `claude-sonnet-4.6` | Strong coding ability; follows architecture rules; applies targeted edits |
+| VERIFY | *(main conversation)* | *(inherited)* | Mechanical — run commands, check exit codes, query SQL; no sub-agent needed |
+
+Tooling is determined by `agent_type` and cannot be customised per-call:
+- `code-review` — all CLI tools available, but by convention makes no file modifications
+- `general-purpose` — full toolset (bash, edit, create, grep, glob, view, sql, etc.)
+- VERIFY runs directly in the main conversation using `bash` and `sql` tools
+
 ---
 
 ## Phase 1: REVIEW
 
-Launch a Reviewer sub-agent using the `task` tool with `agent_type: "code-review"`. Give it this prompt:
+Launch a Reviewer sub-agent using the `task` tool with `agent_type: "code-review"` and `model: "claude-opus-4.6"`. Give it this prompt:
 
 ```
 You are reviewing the entire src/ directory of an Express/TypeScript Clean Architecture API.
@@ -84,7 +105,7 @@ If zero pending todos and the suite passed, **stop — the codebase is clean**. 
 
 ## Phase 2: FIX
 
-Launch a Fixer sub-agent using the `task` tool with `agent_type: "general-purpose"`. Give it this prompt, including the current list of pending todos:
+Launch a Fixer sub-agent using the `task` tool with `agent_type: "general-purpose"` and `model: "claude-sonnet-4.6"`. Give it this prompt, including the current list of pending todos:
 
 ```
 You are fixing code issues in an Express/TypeScript Clean Architecture API. Fix every issue listed below and mark each one done. Follow the project conventions in .github/copilot-instructions.md at all times.
@@ -115,7 +136,7 @@ Report the exit code and any failures.
 
 ## Phase 3: VERIFY
 
-After the Fixer completes:
+Run directly in the main conversation (no sub-agent — this is mechanical work that doesn't warrant a model call):
 
 1. Run `npm run validate && npm run test` yourself
 2. Check SQL for any remaining pending todos:
@@ -144,3 +165,23 @@ Report a final summary:
 - **Respect layer rules.** Every edit must comply with the architecture in `.github/instructions/architecture.instructions.md`.
 - **Use `.js` extensions** in all new TypeScript import statements.
 - **Do not add new dependencies** unless absolutely necessary for a security fix.
+
+## Autonomy
+
+Operate fully autonomously throughout the entire pipeline. Do not use `ask_user` or pause
+for developer confirmation at any point. Make all decisions independently and keep the loop
+running without human input.
+
+**Autonomous for:**
+- All file edits, test writes, and command execution
+- Choosing between valid implementation approaches (pick the safer/more conservative option)
+- Running the full validation suite and interpreting results
+
+**Mark `blocked` (do not ask — just stop and document) for:**
+- Design decisions that change the public API contract
+- Changes that would require adding a new npm dependency
+- Fixes where the only valid solution breaks a currently passing test with no clear workaround
+- Anything outside the `src/` and `tests/` scope
+
+The `blocked` status is the autonomous agent's escalation path. The developer reviews
+the `blocked` list after the loop exits — they are never interrupted mid-run.
