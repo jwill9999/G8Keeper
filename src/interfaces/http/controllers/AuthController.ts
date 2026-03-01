@@ -54,7 +54,7 @@ export class AuthController {
     return (
       this.cookieOptions ?? {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'strict',
         path: '/auth',
         maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -455,7 +455,8 @@ export class AuthController {
       res.json({
         success: true,
         message: 'Google login successful',
-        ...result,
+        token: result.token,
+        user: result.user,
       });
     } catch (error) {
       this.handleError(error, res, next);

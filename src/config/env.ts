@@ -25,7 +25,13 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '5m',
   refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || jwtSecret,
   refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
-  refreshTokenTtlMs: parseInt(process.env.REFRESH_TOKEN_TTL_MS || '604800000', 10), // 7 days
+  refreshTokenTtlMs: (() => {
+    const ttl = parseInt(process.env.REFRESH_TOKEN_TTL_MS || '604800000', 10);
+    if (!Number.isFinite(ttl) || ttl <= 0) {
+      throw new Error('REFRESH_TOKEN_TTL_MS must be a positive integer (milliseconds)');
+    }
+    return ttl;
+  })(), // 7 days default
   sessionSecret,
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5174',
   google: {

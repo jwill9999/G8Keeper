@@ -91,6 +91,13 @@ const authController = new AuthController(
   adminRevokeSessions,
   googleOAuthLogin,
   config.adminUserIds,
+  {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'strict',
+    path: '/auth',
+    maxAge: config.refreshTokenTtlMs,
+  },
 );
 const protectedController = new ProtectedController(authMiddleware);
 
@@ -194,9 +201,14 @@ app.use((_req: Request, res: Response) => {
 });
 
 (async () => {
-  await connectDB(config.mongoUri);
-  app.listen(config.port, () => {
-    console.log(`Server running on port ${config.port}`);
-    console.log(`Visit http://localhost:${config.port} for API info`);
-  });
+  try {
+    await connectDB(config.mongoUri);
+    app.listen(config.port, () => {
+      console.log(`Server running on port ${config.port}`);
+      console.log(`Visit http://localhost:${config.port} for API info`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
 })();
