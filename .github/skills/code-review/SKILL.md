@@ -18,11 +18,27 @@ Run these phases in order, looping until clean:
 
 Exit when: the Reviewer finds zero new issues AND `npm run validate && npm run test` exits 0.
 
+## Model & Tooling Assignments
+
+Each phase uses the best model for the job. Models are set explicitly via the `model`
+parameter on each `task` call — Copilot does not auto-select:
+
+| Phase | agent_type | model | Rationale |
+|-------|-----------|-------|-----------|
+| REVIEW | `code-review` | `claude-opus-4.6` | Deep reasoning across many files; subtle bug and security detection |
+| FIX | `general-purpose` | `claude-sonnet-4.6` | Strong coding ability; follows architecture rules; applies targeted edits |
+| VERIFY | *(main conversation)* | *(inherited)* | Mechanical — run commands, check exit codes, query SQL; no sub-agent needed |
+
+Tooling is determined by `agent_type` and cannot be customised per-call:
+- `code-review` — all CLI tools available, but by convention makes no file modifications
+- `general-purpose` — full toolset (bash, edit, create, grep, glob, view, sql, etc.)
+- VERIFY runs directly in the main conversation using `bash` and `sql` tools
+
 ---
 
 ## Phase 1: REVIEW
 
-Launch a Reviewer sub-agent using the `task` tool with `agent_type: "code-review"`. Give it this prompt:
+Launch a Reviewer sub-agent using the `task` tool with `agent_type: "code-review"` and `model: "claude-opus-4.6"`. Give it this prompt:
 
 ```
 You are reviewing the entire src/ directory of an Express/TypeScript Clean Architecture API.
@@ -84,7 +100,7 @@ If zero pending todos and the suite passed, **stop — the codebase is clean**. 
 
 ## Phase 2: FIX
 
-Launch a Fixer sub-agent using the `task` tool with `agent_type: "general-purpose"`. Give it this prompt, including the current list of pending todos:
+Launch a Fixer sub-agent using the `task` tool with `agent_type: "general-purpose"` and `model: "claude-sonnet-4.6"`. Give it this prompt, including the current list of pending todos:
 
 ```
 You are fixing code issues in an Express/TypeScript Clean Architecture API. Fix every issue listed below and mark each one done. Follow the project conventions in .github/copilot-instructions.md at all times.
@@ -115,7 +131,7 @@ Report the exit code and any failures.
 
 ## Phase 3: VERIFY
 
-After the Fixer completes:
+Run directly in the main conversation (no sub-agent — this is mechanical work that doesn't warrant a model call):
 
 1. Run `npm run validate && npm run test` yourself
 2. Check SQL for any remaining pending todos:
