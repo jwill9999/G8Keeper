@@ -17,7 +17,7 @@ System design, database schemas, and technical architecture decisions.
 
 Project tracking, completed features, and future roadmap.
 
-- [Index](./planning/index.md) - Completed features and timeline
+- [Completed Features](./planning/completed-features.md) - Completed features and timeline
 - [Backlog](./planning/backlog.md) - Planned features and improvements
 - [Roadmap](./planning/roadmap.md) - Long-term vision and milestones
 - [Feature Plans](./planning/features/) - Detailed implementation plans for features
@@ -59,7 +59,7 @@ Historical record of changes and updates.
 When making changes to the project:
 
 1. Update relevant documentation in the appropriate section
-2. Add entry to [planning/index.md](./planning/index.md)
+2. Add entry to [planning/completed-features.md](./planning/completed-features.md)
 3. Update backlog if completing planned features
 4. Add changelog entry for significant changes
 
