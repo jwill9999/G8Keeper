@@ -48,6 +48,7 @@ Historical record of changes and updates.
 
 ## 🚀 Quick Links
 
+- **📖 Live Docs Site**: [https://letuscode.co.uk/express-auth-app/](https://letuscode.co.uk/express-auth-app/)
 - **Getting Started**: [Setup Guide](./guides/setup.md)
 - **API Documentation**: [Swagger UI](http://localhost:3000/api-docs) (when running)
 - **Architecture Overview**: [System Design](./architecture/overview.md)
@@ -67,4 +68,4 @@ See [Documentation Instructions](../.github/instructions/docs.instructions.md) f
 ---
 
 **Last Updated:** 2026-03-01  
-**Project Version:** 1.1.3
+**Project Version:** 1.1.4

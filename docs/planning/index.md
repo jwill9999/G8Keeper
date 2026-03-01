@@ -22,6 +22,7 @@ This document tracks all features, changes, and additions to the project with ti
 | 10  | Session Lifecycle Fixes         | 2026-02-21 | 🔴 High   | ✅ Complete | Architecture + security | [↓](#session-lifecycle-fixes---2026-02-21)         |
 | 11  | PR Code Review Fixes            | 2026-02-28 | 🔴 High   | ✅ Complete | Race condition + DX     | [↓](#pr-code-review-fixes---2026-02-28)            |
 | 12  | Rate Limiting Middleware        | 2026-03-01 | 🔴 High   | ✅ Complete | Brute force protection  | [↓](#rate-limiting-middleware---2026-03-01)        |
+| 13  | GitHub Pages Documentation Site | 2026-03-01 | 🟢 Low    | ✅ Complete | Browsable public docs   | [↓](#github-pages-documentation-site---2026-03-01) |
 
 > **Note:** When completed features exceed 15 items, individual features will be moved to separate files in `completed/` directory.
 
@@ -42,6 +43,19 @@ This document tracks all features, changes, and additions to the project with ti
 - `src/interfaces/http/controllers/AuthController.ts` — 429 Swagger docs on register/login
 - `tests/interfaces/http/rateLimiter.test.ts` (new)
 **Related Docs:** [backlog.md](backlog.md#rate-limiting-middleware)
+
+---
+
+### GitHub Pages Documentation Site - 2026-03-01
+
+**Status:** ✅ Completed
+**Author:** Development Team
+**Description:** Enabled GitHub Pages to serve the `docs/` folder as a browsable public documentation site. No content was migrated — all docs remain in the repo for version control, PR reviews, and AI agent access. Added `docs/_config.yml` for Jekyll configuration.
+**Files Changed:**
+- `docs/_config.yml` (new) — Jekyll config with title, theme, baseurl
+- `docs/README.md` — added live Pages URL to Quick Links
+**Live URL:** [https://letuscode.co.uk/express-auth-app/](https://letuscode.co.uk/express-auth-app/)
+**Related Docs:** [backlog.md](backlog.md)
 
 ---
 
