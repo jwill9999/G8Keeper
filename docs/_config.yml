@@ -6,8 +6,7 @@ url: "https://letuscode.co.uk"
 
 header_pages: []
 
-author:
-  name: Development Team
+author: Jason Williams
 
 defaults:
   - scope:

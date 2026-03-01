@@ -21,7 +21,7 @@
     "prepare": "husky"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jason Williams <jasonwilliams@letuscode.co.uk> (https://letuscode.co.uk)",
   "license": "ISC",
   "lint-staged": {
     "src/**/*.ts": [
