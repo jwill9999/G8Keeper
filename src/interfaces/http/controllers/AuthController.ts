@@ -28,19 +28,19 @@ export interface CookieOptions {
 }
 
 export class AuthController {
-  private router: Router;
+  private readonly router: Router;
 
   constructor(
-    private registerUser: RegisterUser,
-    private loginUser: LoginUser,
-    private tokenProvider: TokenProvider,
-    private refreshSessionUseCase?: RefreshSessionUseCase,
-    private logoutCurrentSession?: LogoutCurrentSession,
-    private logoutAllSessions?: LogoutAllSessions,
-    private adminRevokeSessions?: AdminRevokeSessions,
-    private googleOAuthLogin?: GoogleOAuthLogin,
-    private adminUserIds?: string[],
-    private cookieOptions?: CookieOptions,
+    private readonly registerUser: RegisterUser,
+    private readonly loginUser: LoginUser,
+    private readonly tokenProvider: TokenProvider,
+    private readonly refreshSessionUseCase?: RefreshSessionUseCase,
+    private readonly logoutCurrentSession?: LogoutCurrentSession,
+    private readonly logoutAllSessions?: LogoutAllSessions,
+    private readonly adminRevokeSessions?: AdminRevokeSessions,
+    private readonly googleOAuthLogin?: GoogleOAuthLogin,
+    private readonly adminUserIds?: string[],
+    private readonly cookieOptions?: CookieOptions,
   ) {
     this.router = Router();
     this.setupRoutes();
