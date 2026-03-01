@@ -2,7 +2,7 @@
 
 Features, improvements, and tasks planned for future development.
 
-**Total Items:** 15 | **High:** 3 | **Medium:** 3 | **Low:** 4 | **Tech Debt:** 4
+**Total Items:** 17 | **High:** 3 | **Medium:** 5 | **Low:** 4 | **Tech Debt:** 4
 
 ---
 
@@ -10,7 +10,7 @@ Features, improvements, and tasks planned for future development.
 
 | #   | Feature                          | Priority  | Effort | Est. Time | Status     | Details                             |
 | --- | -------------------------------- | --------- | ------ | --------- | ---------- | ----------------------------------- |
-| 1   | Rate Limiting Middleware         | 🔴 High   | Small  | 2-4h      | 📋 Planned | [↓](#rate-limiting-middleware)      |
+| 1   | ~~Rate Limiting Middleware~~     | ~~🔴 High~~   | ~~Small~~  | ~~2-4h~~      | ✅ Done    | [↓](#rate-limiting-middleware)      |
 | 2   | ~~Refresh Token Implementation~~ | ~~🔴 High~~ | ~~Medium~~ | ~~8-12h~~ | ✅ Done | [↓](#refresh-token-implementation)  |
 | 2a  | Frontend Auth Integration        | 🔴 High   | Medium | 6-10h     | 📋 Planned | [↓](#frontend-auth-integration)     |
 | 3   | Email Verification               | 🔴 High   | Large  | 16-20h    | 📋 Planned | [↓](#email-verification)            |
@@ -18,6 +18,8 @@ Features, improvements, and tasks planned for future development.
 | 5   | Password Reset Flow              | 🟡 Medium | Medium | 10-14h    | 📋 Planned | [↓](#password-reset-flow)           |
 | 6   | API Versioning                   | 🟡 Medium | Small  | 4-6h      | 📋 Planned | [↓](#api-versioning)                |
 | 7   | Admin Dashboard Backend          | 🟡 Medium | Large  | 24-32h    | 📋 Planned | [↓](#admin-dashboard-backend)       |
+| 10a | Redis Rate Limit Store           | 🟡 Medium | Small  | 2-4h      | 📋 Planned | [↓](#redis-rate-limit-store)        |
+| 10b | Nginx Reverse Proxy Rate Limiting | 🟡 Medium | Small  | 2-3h      | 📋 Planned | [↓](#nginx-reverse-proxy-rate-limiting) |
 | 8   | Two-Factor Authentication (2FA)  | 🟢 Low    | Large  | 20-24h    | 📋 Planned | [↓](#two-factor-authentication-2fa) |
 | 9   | Social Login (GitHub, Microsoft) | 🟢 Low    | Medium | 8-12h     | 📋 Planned | [↓](#social-login-github-microsoft) |
 | 10  | Redis Caching Layer              | 🟢 Low    | Medium | 10-14h    | 📋 Planned | [↓](#redis-caching-layer)           |
@@ -41,32 +43,21 @@ Features, improvements, and tasks planned for future development.
 
 ### Rate Limiting Middleware
 
-**Priority:** 🔴 High  
-**Effort:** Small  
-**Estimated Time:** 2-4 hours
+**Priority:** 🔴 High — ✅ **Completed 2026-03-01**
+**Effort:** Small
 
-**Description:**  
-Implement rate limiting to prevent API abuse and protect against brute force attacks.
-
-**Requirements:**
-
-- Use `express-rate-limit` package
-- Different limits for different endpoint types:
-  - Auth endpoints: 5 requests per 15 minutes
-  - Protected endpoints: 100 requests per 15 minutes
-  - Health check: Unlimited
-- Return `429 Too Many Requests` with `Retry-After` header
-- Log rate limit violations
+**Description:**
+Implemented `express-rate-limit` middleware protecting auth endpoints (5 req/15 min) and protected API endpoints (100 req/15 min). Returns `429 Too Many Requests` with `RateLimit-*` standard headers. Rate limiting is opt-out via `rateLimiting: false` in `AppDependencies` (used in tests).
 
 **Acceptance Criteria:**
 
-- [ ] Install and configure express-rate-limit
-- [ ] Apply rate limiting to auth routes
-- [ ] Apply rate limiting to protected routes
-- [ ] Return proper 429 status codes
-- [ ] Add rate limit info to response headers
-- [ ] Document rate limits in API docs
-- [ ] Add tests for rate limiting
+- [x] Install and configure express-rate-limit
+- [x] Apply rate limiting to auth routes
+- [x] Apply rate limiting to protected routes
+- [x] Return proper 429 status codes
+- [x] Add rate limit info to response headers (`RateLimit-*`)
+- [x] Document rate limits in API docs (Swagger 429 responses + `RateLimitError` schema)
+- [x] Add tests for rate limiting
 
 **Related:**
 
@@ -197,6 +188,12 @@ api.interceptors.response.use(
 - [ ] Logout all devices → other tabs fail on next refresh → redirected to login
 - [ ] Simulate token theft (replay old refresh token) → reuse detected → forced re-login
 
+**Documentation:**
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Create/update `docs/guides/setup.md` — frontend integration guide (token storage, interceptor pattern, cookie requirements)
+
 ---
 
 ### Email Verification
@@ -227,8 +224,13 @@ Add email verification to ensure valid email addresses and prevent fake accounts
 - [ ] Send styled HTML emails
 - [ ] Block unverified users from protected routes
 - [ ] Add email templates
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — document `/auth/verify-email` and `/auth/resend-verification`
+- [ ] Update `docs/api/authentication.md` — document the email verification flow
+- [ ] Update `docs/architecture/database-schema.md` — add `emailVerified`, `emailVerificationToken`, `emailVerificationExpires` fields
 
 **Database Changes:**
 
@@ -296,8 +298,12 @@ Allow users to reset their password via email when they forget it.
 - [ ] Validate reset tokens
 - [ ] Expire tokens after 1 hour
 - [ ] Hash new password
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — document `/auth/forgot-password` and `/auth/reset-password`
+- [ ] Update `docs/api/authentication.md` — document the password reset flow
 
 ---
 
@@ -326,7 +332,13 @@ Implement API versioning to support multiple API versions simultaneously.
 - [ ] Support Accept-Version header
 - [ ] Update documentation
 - [ ] Add deprecation mechanism
-- [ ] Update frontend integration docs
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — prefix all routes with `/v1`
+- [ ] Update `docs/api/authentication.md` — note versioning strategy
+- [ ] Update `docs/guides/development.md` — document how to add new API versions
+- [ ] Update frontend integration docs to use `/v1` prefix
 
 ---
 
@@ -358,8 +370,14 @@ Create admin-only endpoints for user management and system monitoring.
 - [ ] DELETE /admin/users/:id (delete user)
 - [ ] GET /admin/stats (system statistics)
 - [ ] Add admin seed script
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — document all `/admin/*` endpoints
+- [ ] Update `docs/architecture/overview.md` — document role-based access control
+- [ ] Update `docs/architecture/database-schema.md` — add `roles` field to User schema
+- [ ] Create `docs/guides/setup.md` section — document admin seed script usage
 
 ---
 
@@ -391,8 +409,13 @@ Add optional two-factor authentication using TOTP (Google Authenticator, Authy).
 - [ ] Generate and display QR codes
 - [ ] Generate backup codes
 - [ ] Modify login flow for 2FA
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — document `/auth/2fa/enable` and `/auth/2fa/verify`
+- [ ] Update `docs/api/authentication.md` — document the 2FA login flow
+- [ ] Update `docs/architecture/database-schema.md` — add 2FA fields to User schema
 
 ---
 
@@ -419,8 +442,13 @@ Add additional OAuth providers beyond Google.
 - [ ] Create OAuth routes for each provider
 - [ ] Update User model for multiple providers
 - [ ] Allow linking accounts
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/authentication.md` — document GitHub and Microsoft OAuth flows
+- [ ] Update `docs/architecture/database-schema.md` — document multi-provider User schema changes
+- [ ] Update `docs/guides/setup.md` — add GitHub and Microsoft OAuth app configuration steps
 
 ---
 
@@ -450,8 +478,80 @@ Add Redis for caching and session storage to improve performance.
 - [ ] Store sessions in Redis
 - [ ] Implement cache invalidation
 - [ ] Add cache middleware
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/architecture/overview.md` — document Redis in the infrastructure layer
+- [ ] Create/update `docs/guides/deployment.md` — Redis setup, Docker Compose config, and graceful degradation notes
+
+---
+
+### Redis Rate Limit Store
+
+**Priority:** 🟡 Medium  
+**Effort:** Small  
+**Estimated Time:** 2-4 hours  
+**Dependencies:** Redis Caching Layer (Redis must be running in Docker Compose)
+
+**Description:**  
+The current `express-rate-limit` middleware uses an **in-memory store**, which means each Node.js process maintains its own independent counter. If the app is ever scaled horizontally (multiple instances or pods), a client gets `limit × instances` effective requests — completely defeating the rate limiter. Switching to `rate-limit-redis` gives a single shared counter across all instances.
+
+**Requirements:**
+
+- Install `rate-limit-redis` (or `@upstash/ratelimit` for serverless)
+- Connect rate limiter to the existing Redis instance
+- Graceful degradation: fall back to in-memory if Redis is unavailable
+- No change to the existing limits or API behaviour
+
+**Acceptance Criteria:**
+
+- [ ] Install `rate-limit-redis`
+- [ ] Create a shared Redis client (reuse from Redis Caching Layer)
+- [ ] Pass Redis store to `authRateLimiter` and `protectedRateLimiter`
+- [ ] Verify counters are shared across two parallel app instances
+- [ ] Graceful degradation when Redis is down (log warning, don't crash)
+- [ ] Update tests (mock Redis store)
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/architecture/overview.md` to note Redis as rate limit store
+
+**Notes:**
+Must be implemented before deploying more than one Node instance in production. Safe to skip until horizontal scaling is needed.
+
+---
+
+### Nginx Reverse Proxy Rate Limiting
+
+**Priority:** 🟡 Medium  
+**Effort:** Small  
+**Estimated Time:** 2-3 hours  
+**Dependencies:** Redis Rate Limit Store (app-level limiter should be hardened first)
+
+**Description:**  
+Move coarse-grained rate limiting to the Nginx reverse proxy layer so that excess traffic is rejected **before** it reaches Node.js. This reduces CPU/memory load on the app for abusive clients. The `express-rate-limit` middleware is kept as a defence-in-depth backstop (e.g. if someone hits the app directly by IP).
+
+**Requirements:**
+
+- Nginx `limit_req_zone` and `limit_req` directives for `/auth/` and `/api/` locations
+- Return `429` with a JSON body consistent with the app's error format
+- App-level rate limiter remains active but limits are relaxed (higher threshold) since Nginx handles the primary enforcement
+- Nginx config added to Docker Compose production setup
+
+**Acceptance Criteria:**
+
+- [ ] Add `limit_req_zone` zones in `nginx.conf` (auth: 5r/m, api: 100r/m per IP)
+- [ ] Apply `limit_req` to `/auth/` and `/api/` location blocks
+- [ ] Configure `limit_req_status 429` and a custom JSON error page
+- [ ] Relax app-level limits to act as backstop only (e.g. 2× Nginx limit)
+- [ ] Test that Nginx blocks before Node handles the request (check access logs)
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Create/update `docs/guides/deployment.md` — document Nginx rate limiting config and how to tune limits
+- [ ] Update `docs/architecture/overview.md` — note Nginx as the primary rate limiting layer
+- [ ] Update `docker-compose.prod.yml` with Nginx service config
 
 ---
 
@@ -481,8 +581,12 @@ Allow external systems to subscribe to events (user registered, login, etc.).
 - [ ] Implement retry queue
 - [ ] Add webhook logs
 - [ ] Create webhook testing tool
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Update `docs/api/endpoints.md` — document all `/webhooks/*` endpoints
+- [ ] Update `docs/architecture/overview.md` — document event emitter pattern
 
 ---
 
@@ -512,8 +616,12 @@ Add GraphQL API alongside REST API for more flexible data fetching.
 - [ ] Add authentication middleware
 - [ ] Set up GraphQL Playground
 - [ ] Implement subscriptions (optional)
-- [ ] Update documentation
 - [ ] Add tests
+- [ ] Update `docs/planning/index.md` with completed feature entry
+- [ ] Update `docs/planning/backlog.md` (mark done)
+- [ ] Add entry to `docs/changelog/YYYY-MM.md`
+- [ ] Create `docs/api/graphql.md` — schema reference and example queries
+- [ ] Update `docs/architecture/overview.md` — document GraphQL alongside REST
 
 ---
 
@@ -580,6 +688,6 @@ Add GraphQL API alongside REST API for more flexible data fetching.
 
 ---
 
-**Last Updated:** 2026-02-28  
-**Total Items:** 15 prioritized + 4 technical debt + ideas  
+**Last Updated:** 2026-03-01  
+**Total Items:** 17 prioritized + 4 technical debt + ideas  
 **Next Review:** 2026-03-31
