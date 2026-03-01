@@ -8,3 +8,9 @@ header_pages: []
 
 author:
   name: Development Team
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
