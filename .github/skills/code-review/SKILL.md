@@ -165,3 +165,23 @@ Report a final summary:
 - **Respect layer rules.** Every edit must comply with the architecture in `.github/instructions/architecture.instructions.md`.
 - **Use `.js` extensions** in all new TypeScript import statements.
 - **Do not add new dependencies** unless absolutely necessary for a security fix.
+
+## Autonomy
+
+Operate fully autonomously throughout the entire pipeline. Do not use `ask_user` or pause
+for developer confirmation at any point. Make all decisions independently and keep the loop
+running without human input.
+
+**Autonomous for:**
+- All file edits, test writes, and command execution
+- Choosing between valid implementation approaches (pick the safer/more conservative option)
+- Running the full validation suite and interpreting results
+
+**Mark `blocked` (do not ask — just stop and document) for:**
+- Design decisions that change the public API contract
+- Changes that would require adding a new npm dependency
+- Fixes where the only valid solution breaks a currently passing test with no clear workaround
+- Anything outside the `src/` and `tests/` scope
+
+The `blocked` status is the autonomous agent's escalation path. The developer reviews
+the `blocked` list after the loop exits — they are never interrupted mid-run.
