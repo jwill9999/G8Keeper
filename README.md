@@ -77,8 +77,11 @@ This project uses different environment files for different environments:
 # Copy and configure development environment
 cp .env.development .env.development.local  # Optional: for local overrides
 
-# Start development services
+# Start development services (builds the image automatically on first run)
 docker-compose up -d
+
+# After changing code or Dockerfile, force a rebuild:
+docker-compose up -d --build
 
 # View logs
 docker-compose logs -f app
@@ -90,8 +93,11 @@ docker-compose logs -f app
 # IMPORTANT: Update .env.production with strong secrets before deploying!
 nano .env.production
 
-# Start production services
+# Start production services (builds the image automatically on first run)
 docker-compose -f docker-compose.prod.yml up -d
+
+# After changing code or Dockerfile, force a rebuild:
+docker-compose -f docker-compose.prod.yml up -d --build
 
 # View logs
 docker-compose -f docker-compose.prod.yml logs -f app
