@@ -1,12 +1,12 @@
-title: Express Auth API
-description: Clean Architecture Express.js authentication API — documentation
+title: G8keeper
+description: G8Keeper Authentication — documentation
 theme: minima
-baseurl: "/express-auth-app"
+baseurl: "/g8keeper
 url: "https://letuscode.co.uk"
 
 header_pages: []
 
-author: Jason Williams
+author: Jason Williams, Software Engineer at LetUsCode
 
 exclude:
   - planning/
