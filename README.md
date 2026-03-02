@@ -1,4 +1,4 @@
-# Express Authentication API
+# G8Keeper
 
 [![CI](https://github.com/jwill9999/express-auth-app/actions/workflows/ci.yml/badge.svg)](https://github.com/jwill9999/express-auth-app/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/jwill9999/express-auth-app/branch/main/graph/badge.svg)](https://codecov.io/gh/jwill9999/express-auth-app)
