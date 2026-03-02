@@ -1,7 +1,7 @@
 {
-  "name": "express-auth-app",
+  "name": "g8keeper",
   "version": "1.0.0",
-  "description": "",
+  "description": "Authentication SaaS for developers, built with Express.js and TypeScript",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
