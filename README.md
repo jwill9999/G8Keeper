@@ -4,6 +4,8 @@
 [![codecov](https://codecov.io/gh/jwill9999/express-auth-app/branch/main/graph/badge.svg)](https://codecov.io/gh/jwill9999/express-auth-app)
 [![Dependency Review](https://github.com/jwill9999/express-auth-app/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/jwill9999/express-auth-app/actions/workflows/pr-checks.yml)
 [![Docker](https://github.com/jwill9999/express-auth-app/actions/workflows/docker.yml/badge.svg)](https://github.com/jwill9999/express-auth-app/actions/workflows/docker.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jwill9999_G8Keeper&metric=alert_status)](https://sonarcloud.io/project/overview?id=jwill9999_G8Keeper)
+[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai/gh/jwill9999/express-auth-app)
 
 A **TypeScript** Node.js Express application with email/password authentication, Google SSO, JWT tokens, and protected routes.
 
@@ -38,6 +40,8 @@ Run `npm run lint:deps` to verify no architectural boundaries are violated.
 - ✅ **CodeQL SAST** — static analysis for JavaScript/TypeScript (enabled via GitHub Settings)
 - ✅ **Secret Scanning** with push protection (enabled via GitHub Settings)
 - ✅ **Trivy container CVE scanning** on every PR and post-merge to main
+- ✅ **SonarCloud** — continuous code quality and security analysis with Quality Gate on every PR
+- ✅ **Sourcery** — AI-powered code review on every PR
 
 ## Tech Stack
 
