@@ -22,9 +22,10 @@ Provide a structured workflow for breaking down feature requirements into tracka
 ### Step 1: Understand the Requirement
 
 1. Read the feature description from `docs/planning/backlog.md` (if it exists there)
-2. Review related architecture docs in `docs/architecture/`
-3. Check for dependencies on other backlog items
-4. Identify the affected layers (domain, application, infrastructure, interface) per `architecture.instructions.md`
+2. Check if the feature is part of the **SaaS Platform phased build plan** in `docs/planning/backlog.md` — if so, reference the specific phase and task IDs (e.g., P1-3, P3-7)
+3. Review related architecture docs in `docs/architecture/`
+4. Check for dependencies on other backlog items or SaaS Platform phases
+5. Identify the affected layers (domain, application, infrastructure, interface) per `architecture.instructions.md`
 
 ### Step 2: Create a Feature Plan
 
@@ -67,6 +68,7 @@ Brief description of the feature and its business value.
 ## Sub-Tasks
 
 ### 1. [Task Name]
+
 - **Layer:** Domain | Application | Infrastructure | Interface
 - **Effort:** Small
 - **Status:** ⬜ Not Started | 🚧 In Progress | ✅ Done
@@ -82,6 +84,7 @@ Brief description of the feature and its business value.
   - [ ] Criterion 2
 
 ### 2. [Task Name]
+
 ...
 
 ## Dependencies
@@ -95,11 +98,11 @@ Any design decisions, diagrams, or technical considerations.
 
 ## Documentation Impact
 
-| Document | Change Required |
-|----------|----------------|
-| `docs/api/endpoints.md` | Add new endpoint docs |
+| Document                        | Change Required             |
+| ------------------------------- | --------------------------- |
+| `docs/api/endpoints.md`         | Add new endpoint docs       |
 | `docs/architecture/overview.md` | Update architecture diagram |
-| `docs/guides/setup.md` | Update setup instructions |
+| `docs/guides/setup.md`          | Update setup instructions   |
 
 ## Testing Strategy
 
@@ -122,6 +125,16 @@ Any design decisions, diagrams, or technical considerations.
 - After completing a feature plan, use the `docs` skill to update index, backlog, and changelog
 
 ## Examples
+
+### Planning a SaaS Platform Phase
+
+When asked to implement a SaaS Platform phase (e.g., "Phase 1 — RS256 Migration"):
+
+1. Read the phase from `docs/planning/backlog.md#phase-1--rs256-migration--jwks`
+2. Each task is already identified with an ID (P1-1, P1-2, etc.) and acceptance criteria
+3. Optionally create `docs/planning/features/saas-phase-1-rs256.md` for detailed sub-task tracking
+4. Follow the standard sub-task breakdown, referencing the task IDs from the backlog
+5. Update backlog status to `🚧 In Progress` for the phase
 
 ### Planning a Backlog Feature
 
@@ -148,5 +161,4 @@ When asked to plan a feature not yet in the backlog:
 
 ---
 
-**Last Updated:** 2026-02-21
-**Maintained By:** Development Team
+**Last Updated:** 2026-03-03

@@ -13,10 +13,12 @@ This directory contains detailed implementation plans for features being develop
 
 ## Active Feature Plans
 
-| Feature      | Status | Priority | File |
-| ------------ | ------ | -------- | ---- |
-| _(none yet)_ |        |          |      |
+| Feature                       | Status     | Priority | File                                                               |
+| ----------------------------- | ---------- | -------- | ------------------------------------------------------------------ |
+| SaaS Auth Platform (6 phases) | 📋 Planned | 🔴 High  | [backlog.md](../backlog.md#-saas-auth-platform--phased-build-plan) |
 
+> The SaaS Platform plan lives in `backlog.md` rather than a separate feature plan file because it spans 6 phases and 33+ tasks across multiple bounded contexts. Individual phases can be broken into separate feature plan files here if needed during implementation.
+>
 > Update this table when adding or completing feature plans.
 
 ## Conventions
@@ -28,4 +30,4 @@ This directory contains detailed implementation plans for features being develop
 
 ---
 
-**Last Updated:** 2026-02-21
+**Last Updated:** 2026-03-03

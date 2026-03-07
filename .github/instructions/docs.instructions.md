@@ -6,6 +6,7 @@ applyTo: 'docs/**/*'
 # Documentation Instructions
 
 ## Purpose
+
 Maintain comprehensive, up-to-date documentation for the Express Auth API project.
 
 ## Documentation Structure
@@ -21,9 +22,13 @@ docs/
 │   ├── authentication.md    # Auth flow and JWT strategy
 │   └── api-design.md        # API design principles
 ├── planning/                 # Project planning and tracking
-│   ├── index.md             # Completed features and additions
-│   ├── backlog.md           # Planned features and improvements
-│   └── roadmap.md           # Long-term vision
+│   ├── index.md             # Planning overview and SaaS Platform links
+│   ├── completed-features.md # Full history of shipped features
+│   ├── backlog.md           # Planned features, SaaS Platform phased build plan
+│   ├── roadmap.md           # Long-term vision and milestones
+│   └── features/            # Individual feature breakdown documents
+│       ├── README.md        # Active feature plans table
+│       └── _template.md     # Feature plan template
 ├── api/                      # API documentation
 │   ├── endpoints.md         # Endpoint reference
 │   ├── authentication.md    # Auth endpoints
@@ -40,6 +45,7 @@ docs/
 ## Guidelines for Maintaining Documentation
 
 ### 1. **Always Update When:**
+
 - Adding new features
 - Modifying existing functionality
 - Changing API endpoints
@@ -48,6 +54,7 @@ docs/
 - Refactoring architecture
 
 ### 2. **Documentation Standards:**
+
 - Use clear, concise language
 - Include code examples where relevant
 - Date all entries in ISO format (YYYY-MM-DD)
@@ -55,8 +62,10 @@ docs/
 - Link between related documents
 
 ### 3. **Format for Index Entries:**
+
 ```markdown
 ### [Feature Name] - YYYY-MM-DD
+
 **Status:** ✅ Completed | 🚧 In Progress | ⏸️ Paused
 **Author:** [Name/Team]
 **Description:** Brief description of what was added
@@ -65,8 +74,10 @@ docs/
 ```
 
 ### 4. **Format for Backlog Entries:**
+
 ```markdown
 ### [Feature Name]
+
 **Priority:** 🔴 High | 🟡 Medium | 🟢 Low
 **Effort:** Small | Medium | Large
 **Description:** What needs to be done
@@ -75,7 +86,9 @@ docs/
 ```
 
 ### 5. **Changelog Format:**
+
 Follow Keep a Changelog format:
+
 - `Added` for new features
 - `Changed` for changes in existing functionality
 - `Deprecated` for soon-to-be removed features
@@ -84,13 +97,16 @@ Follow Keep a Changelog format:
 - `Security` for security-related changes
 
 ### 6. **When to Create New Documents:**
+
 - New major feature requires dedicated architecture doc
 - Complex process needs step-by-step guide
 - Significant refactoring needs planning document
 - New integration requires setup guide
 
 ### 7. **AI Assistant Responsibilities:**
+
 When working on this project, you should:
+
 - Update relevant documentation automatically
 - Suggest new documentation when gaps are identified
 - Keep index.md and backlog.md in sync with code changes
@@ -100,7 +116,9 @@ When working on this project, you should:
 - Update timestamps and version information
 
 ### 8. **Review Checklist:**
+
 Before completing any task, verify:
+
 - [ ] Updated index.md if feature was added
 - [ ] Moved items from backlog.md if completed
 - [ ] Added changelog entry if significant
@@ -112,26 +130,32 @@ Before completing any task, verify:
 ## Examples
 
 ### Good Index Entry:
+
 ```markdown
 ### TypeScript Migration - 2026-02-15
+
 **Status:** ✅ Completed
 **Author:** Development Team
 **Description:** Converted entire codebase from JavaScript to TypeScript with strict mode
 **Files Changed:** All .js files → .ts in src/, updated tsconfig.json, package.json
-**Related Docs:** 
+**Related Docs:**
+
 - [Architecture: Type System](architecture/typescript.md)
 - [Guide: TypeScript Development](guides/development.md#typescript)
-**Impact:** Improved type safety, better IDE support, caught 15+ potential runtime errors
+  **Impact:** Improved type safety, better IDE support, caught 15+ potential runtime errors
 ```
 
 ### Good Backlog Entry:
+
 ```markdown
 ### Rate Limiting Middleware
+
 **Priority:** 🟡 Medium
 **Effort:** Small
 **Description:** Add rate limiting to prevent API abuse (e.g., 100 requests per 15 minutes)
 **Dependencies:** None
 **Acceptance Criteria:**
+
 - [ ] Implement rate limiting middleware using express-rate-limit
 - [ ] Configure different limits for auth vs. data endpoints
 - [ ] Return proper 429 status with retry-after header
@@ -141,5 +165,5 @@ Before completing any task, verify:
 
 ---
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-03-03
 **Maintained By:** Development Team

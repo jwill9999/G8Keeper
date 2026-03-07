@@ -30,6 +30,16 @@ Step-by-step guides for common tasks.
 - [Deployment](./guides/deployment.md) - Production deployment
 - [Troubleshooting](./guides/troubleshooting.md) - Common issues and solutions
 
+### [Planning](./planning/)
+
+Project planning, feature tracking, and roadmap.
+
+- [Planning Index](./planning/index.md) - Overview and SaaS Platform plan links
+- [Completed Features](./planning/completed-features.md) - Full history of shipped features
+- [Backlog](./planning/backlog.md) - Planned features and **SaaS Platform phased build plan**
+- [Roadmap](./planning/roadmap.md) - Long-term vision and milestones
+- [Feature Plans](./planning/features/) - Individual feature breakdown documents
+
 ## 🚀 Quick Links
 
 - **📖 Live Docs Site**: [https://letuscode.co.uk/express-auth-app/](https://letuscode.co.uk/express-auth-app/)
@@ -48,5 +58,5 @@ See [Documentation Instructions](../.github/instructions/docs.instructions.md) f
 
 ---
 
-**Last Updated:** 2026-03-01  
-**Project Version:** 1.1.4
+**Last Updated:** 2026-03-03  
+**Project Version:** 1.3.0

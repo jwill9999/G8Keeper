@@ -22,9 +22,13 @@ docs/
 │   ├── authentication.md    # Auth flow and JWT strategy
 │   └── api-design.md        # API design principles
 ├── planning/                 # Project planning and tracking
-│   ├── index.md             # Completed features and additions
-│   ├── backlog.md           # Planned features and improvements
-│   └── roadmap.md           # Long-term vision
+│   ├── index.md             # Planning overview and SaaS Platform links
+│   ├── completed-features.md # Full history of shipped features
+│   ├── backlog.md           # Planned features, SaaS Platform phased build plan
+│   ├── roadmap.md           # Long-term vision and milestones
+│   └── features/            # Individual feature breakdown documents
+│       ├── README.md        # Active feature plans table
+│       └── _template.md     # Feature plan template
 ├── api/                      # API documentation
 │   ├── endpoints.md         # Endpoint reference
 │   ├── authentication.md    # Auth endpoints
@@ -161,5 +165,5 @@ Before completing any task, verify:
 
 ---
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-03-03
 **Maintained By:** Development Team

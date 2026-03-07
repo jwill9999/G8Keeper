@@ -2,7 +2,7 @@
 
 This document tracks all features, changes, and additions to the project with timestamps.
 
-**Total Completed:** 12 features | **Current Version:** 1.1.3
+**Total Completed:** 16 features | **Current Version:** 1.3.0
 
 ---
 
@@ -23,6 +23,9 @@ This document tracks all features, changes, and additions to the project with ti
 | 11  | PR Code Review Fixes            | 2026-02-28 | 🔴 High   | ✅ Complete | Race condition + DX     | [↓](#pr-code-review-fixes---2026-02-28)            |
 | 12  | Rate Limiting Middleware        | 2026-03-01 | 🔴 High   | ✅ Complete | Brute force protection  | [↓](#rate-limiting-middleware---2026-03-01)        |
 | 13  | GitHub Pages Documentation Site | 2026-03-01 | 🟢 Low    | ✅ Complete | Browsable public docs   | [↓](#github-pages-documentation-site---2026-03-01) |
+| 14  | Security Hardening & Infrastructure | 2026-03-02 | 🔴 High | ✅ Complete | Defense-in-depth security | [↓](#security-hardening--infrastructure-improvements---2026-03-02) |
+| 15  | Unit Test Coverage ≥ 90%       | 2026-03-02 | 🟡 Medium | ✅ Complete | Full test confidence    | [↓](#unit-test-coverage--90---2026-03-02)          |
+| 16  | CI/CD Pipeline Hardening        | 2026-03-02 | 🔴 High   | ✅ Complete | Secure CI/CD pipelines  | [↓](#cicd-pipeline-hardening--branch-protection---2026-03-02) |
 
 > **Note:** When completed features exceed 15 items, individual features will be moved to separate files in `completed/` directory.
 
@@ -556,7 +559,7 @@ Security and correctness fixes identified by automated code review on PR #2.
 
 ## Summary Statistics
 
-**Total Features Completed:** 14
+**Total Features Completed:** 16
 **Total Files Created:** 55+
 **Total Lines of Code:** ~4,800+
 **Test Coverage:** ≥ 90% across all layers (unit + integration), enforced in CI
